@@ -52,52 +52,67 @@ cell $DeployOk$_store_cell((int) v) inline {
 }
 
 ;;
-;; Type: Add
-;; Header: 0x87d43ac2
-;; TLB: add#87d43ac2 amount:uint32 = Add
+;; Type: Challenge
+;; TLB: _ challengeId:uint32 userId:^string gameId:^string betAmount:uint16 = Challenge
 ;;
 
-(slice, ((int))) $Add$_load(slice sc_0) inline {
-    throw_unless(129, sc_0~load_uint(32) == 2278832834);
-    var v'amount = sc_0~load_uint(32);
-    return (sc_0, (v'amount));
+builder $Challenge$_store(builder build_0, (int, slice, slice, int) v) inline {
+    var (v'challengeId, v'userId, v'gameId, v'betAmount) = v;
+    build_0 = build_0.store_uint(v'challengeId, 32);
+    build_0 = build_0.store_ref(begin_cell().store_slice(v'userId).end_cell());
+    build_0 = build_0.store_ref(begin_cell().store_slice(v'gameId).end_cell());
+    build_0 = build_0.store_uint(v'betAmount, 16);
+    return build_0;
+}
+
+cell $Challenge$_store_cell((int, slice, slice, int) v) inline {
+    return $Challenge$_store(begin_cell(), v).end_cell();
+}
+
+((int, slice, slice, int)) $Challenge$_constructor_challengeId_userId_gameId_betAmount(int challengeId, slice userId, slice gameId, int betAmount) inline {
+    return (challengeId, userId, gameId, betAmount);
 }
 
 ;;
-;; Type: Minus
-;; Header: 0xa47b90c9
-;; TLB: minus#a47b90c9 amount:uint32 = Minus
+;; Type: CreateChallenge
+;; Header: 0xdf300754
+;; TLB: create_challenge#df300754 challengeId:uint32 userId:^string gameId:^string = CreateChallenge
 ;;
 
-(slice, ((int))) $Minus$_load(slice sc_0) inline {
-    throw_unless(129, sc_0~load_uint(32) == 2759561417);
-    var v'amount = sc_0~load_uint(32);
-    return (sc_0, (v'amount));
+(slice, ((int, slice, slice))) $CreateChallenge$_load(slice sc_0) inline {
+    throw_unless(129, sc_0~load_uint(32) == 3744466772);
+    var v'challengeId = sc_0~load_uint(32);
+    var v'userId = sc_0~load_ref().begin_parse();
+    var v'gameId = sc_0~load_ref().begin_parse();
+    return (sc_0, (v'challengeId, v'userId, v'gameId));
 }
 
 ;;
 ;; Type: SampleTactContract
 ;;
 
-builder $SampleTactContract$_store(builder build_0, (slice, int) v) inline {
-    var (v'owner, v'counter) = v;
+builder $SampleTactContract$_store(builder build_0, (slice, int, cell) v) inline {
+    var (v'owner, v'seq, v'challenges) = v;
     build_0 = __tact_store_address(build_0, v'owner);
-    build_0 = build_0.store_uint(v'counter, 32);
+    build_0 = build_0.store_uint(v'seq, 16);
+    build_0 = build_0.store_dict(v'challenges);
     return build_0;
 }
 
-(slice, ((slice, int))) $SampleTactContract$_load(slice sc_0) inline {
+(slice, ((slice, int, cell))) $SampleTactContract$_load(slice sc_0) inline {
     var v'owner = sc_0~__tact_load_address();
-    var v'counter = sc_0~load_uint(32);
-    return (sc_0, (v'owner, v'counter));
+    var v'seq = sc_0~load_uint(16);
+    var v'challenges = sc_0~load_dict();
+    return (sc_0, (v'owner, v'seq, v'challenges));
 }
 
-(slice, ((slice))) $SampleTactContract$init$_load(slice sc_0) inline {
+(slice, ((slice, int))) $SampleTactContract$init$_load(slice sc_0) inline {
     var v'owner = sc_0~__tact_load_address();
-    return (sc_0, (v'owner));
+    var v'seq = sc_0~load_int(257);
+    return (sc_0, (v'owner, v'seq));
 }
 
-(slice, int) $SampleTactContract$_contract_load() impure inline_ref {
+(slice, int, cell) $SampleTactContract$_contract_load() impure inline_ref {
     slice $sc = get_data().begin_parse();
     __tact_context_sys = $sc~load_ref();
     int $loaded = $sc~load_int(1);
@@ -106,13 +121,13 @@ builder $SampleTactContract$_store(builder build_0, (slice, int) v) inline {
     } else {
         ;; Allow only workchain deployments
         throw_unless(137, my_address().preload_uint(11) == 1024);
-        (slice owner) = $sc~$SampleTactContract$init$_load();
+        (slice owner, int seq) = $sc~$SampleTactContract$init$_load();
         $sc.end_parse();
-        return $SampleTactContract$_contract_init(owner);
+        return $SampleTactContract$_contract_init(owner, seq);
     }
 }
 
-() $SampleTactContract$_contract_store((slice, int) v) impure inline {
+() $SampleTactContract$_contract_store((slice, int, cell) v) impure inline {
     builder b = begin_cell();
     b = b.store_ref(__tact_context_sys);
     b = b.store_int(true, 1);

@@ -9,7 +9,7 @@ import {_OWNER, _TEST_ONLY} from "./global.config";
     // Parameters
     let packageName = "sample_SampleTactContract.pkg";
     let owner = Address.parse(_OWNER);
-    let init = await SampleTactContract.init(owner);
+    let init = await SampleTactContract.init(owner,1n);
 
     // Load required data
     let address = contractAddress(0, init);

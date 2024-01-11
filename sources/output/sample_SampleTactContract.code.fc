@@ -11,91 +11,51 @@
 ;; Contract SampleTactContract functions
 ;;
 
-(slice, int) $SampleTactContract$_contract_init(slice $owner) impure inline_ref {
-    var (($self'owner, $self'counter)) = (null(), null());
+(slice, int, cell) $SampleTactContract$_contract_init(slice $owner, int $seq) impure inline_ref {
+    var (($self'owner, $self'seq, $self'challenges)) = (null(), null(), null());
     $self'owner = $owner;
-    $self'counter = 0;
-    return ($self'owner, $self'counter);
+    $self'seq = $seq;
+    return ($self'owner, $self'seq, $self'challenges);
 }
 
-((slice, int), ()) $SampleTactContract$_fun_add((slice, int) $self, int $v) impure inline_ref {
-    var (($self'owner, $self'counter)) = $self;
-    var ($ctx'bounced, $ctx'sender, $ctx'value, $ctx'raw) = __tact_context_get();
-    throw_unless(4429, ( __tact_slice_eq_bits($self'owner, $ctx'sender) ));
-    $self'counter = ($self'counter + $v);
-    return (($self'owner, $self'counter), ());
-}
-
-((slice, int), ()) $SampleTactContract$_fun_minus((slice, int) $self, int $v) impure inline_ref {
-    var (($self'owner, $self'counter)) = $self;
-    var ($ctx'bounced, $ctx'sender, $ctx'value, $ctx'raw) = __tact_context_get();
-    throw_unless(4429, ( __tact_slice_eq_bits($self'owner, $ctx'sender) ));
-    $self'counter = ($self'counter - $v);
-    return (($self'owner, $self'counter), ());
-}
-
-((slice, int), int) $SampleTactContract$_fun_counter((slice, int) $self) impure inline_ref {
-    var (($self'owner, $self'counter)) = $self;
-    return (($self'owner, $self'counter), $self'counter);
-}
-
-((slice, int), int) $SampleTactContract$_fun_getter((slice, int) $self) impure inline_ref {
-    var (($self'owner, $self'counter)) = $self;
-    return (($self'owner, $self'counter), $self'counter);
+((slice, int, cell), cell) $SampleTactContract$_fun_challenges((slice, int, cell) $self) impure inline_ref {
+    var (($self'owner, $self'seq, $self'challenges)) = $self;
+    return (($self'owner, $self'seq, $self'challenges), $self'challenges);
 }
 
 ;;
 ;; Receivers of a Contract SampleTactContract
 ;;
 
-(((slice, int)), ()) $SampleTactContract$_internal_binary_Add((slice, int) $self, (int) $msg) impure inline {
-    var ($self'owner, $self'counter) = $self;
-    var ($msg'amount) = $msg;
-    ($self'owner, $self'counter)~$SampleTactContract$_fun_add($msg'amount);
-    return (($self'owner, $self'counter), ());
+(((slice, int, cell)), ()) $SampleTactContract$_internal_binary_CreateChallenge((slice, int, cell) $self, (int, slice, slice) $msg) impure inline {
+    var ($self'owner, $self'seq, $self'challenges) = $self;
+    var ($msg'challengeId, $msg'userId, $msg'gameId) = $msg;
+    var ($c'challengeId, $c'userId, $c'gameId, $c'betAmount) = $Challenge$_constructor_challengeId_userId_gameId_betAmount($msg'challengeId, $msg'userId, $msg'gameId, 5);
+    $self'challenges~__tact_dict_set_int_cell(257, $msg'challengeId, $Challenge$_store_cell(($c'challengeId, $c'userId, $c'gameId, $c'betAmount)));
+    ($self'owner, $self'seq, $self'challenges)~$SampleTactContract$_fun_reply(__gen_cell_comment_17d8063a1c0f4ad0a53ed18ebce1ebda48cb2ff13de2fcd04cf6b759f56cf81a());
+    return (($self'owner, $self'seq, $self'challenges), ());
 }
 
-(((slice, int)), ()) $SampleTactContract$_internal_binary_Minus((slice, int) $self, (int) $msg) impure inline {
-    var ($self'owner, $self'counter) = $self;
-    var ($msg'amount) = $msg;
-    ($self'owner, $self'counter)~$SampleTactContract$_fun_minus($msg'amount);
-    return (($self'owner, $self'counter), ());
+((slice, int, cell), ()) $SampleTactContract$_internal_text_9c934179ecdd6d432f5c691bdf4b6356e1c3ce20ad0318d69cc273293fd0b431((slice, int, cell) $self) impure inline {
+    var ($self'owner, $self'seq, $self'challenges) = $self;
+    ($self'owner, $self'seq, $self'challenges)~$SampleTactContract$_fun_reply(__gen_cell_comment_fa600810c5e866a353ac9c288ce1914099017be386780462949cc21a3481c525());
+    return (($self'owner, $self'seq, $self'challenges), ());
 }
 
-((slice, int), ()) $SampleTactContract$_internal_text_c4f8d72312edfdef5b7bec7833bdbb162d1511bd78a912aed0f2637af65572ae((slice, int) $self) impure inline {
-    var ($self'owner, $self'counter) = $self;
-    ($self'owner, $self'counter)~$SampleTactContract$_fun_add(1);
-    ($self'owner, $self'counter)~$SampleTactContract$_fun_reply(__gen_cell_comment_3e96a74bf6f672d7e00d5d9c31c1437327e624b173365dc10e024c6410eff184());
-    return (($self'owner, $self'counter), ());
-}
-
-((slice, int), ()) $SampleTactContract$_internal_text_85915b1bf5943fd2853bb660338acacfae39d1f735549cef922255a9945acc3e((slice, int) $self) impure inline {
-    var ($self'owner, $self'counter) = $self;
-    ($self'owner, $self'counter)~$SampleTactContract$_fun_minus(1);
-    ($self'owner, $self'counter)~$SampleTactContract$_fun_reply(__gen_cell_comment_cef66999b58b98d2927b2b02a3a10ae193d666854757897dd911aeabf5224c09());
-    return (($self'owner, $self'counter), ());
-}
-
-(((slice, int)), ()) $SampleTactContract$_internal_binary_Deploy((slice, int) $self, (int) $deploy) impure inline {
-    var ($self'owner, $self'counter) = $self;
+(((slice, int, cell)), ()) $SampleTactContract$_internal_binary_Deploy((slice, int, cell) $self, (int) $deploy) impure inline {
+    var ($self'owner, $self'seq, $self'challenges) = $self;
     var ($deploy'queryId) = $deploy;
-    ($self'owner, $self'counter)~$SampleTactContract$_fun_notify($DeployOk$_store_cell($DeployOk$_constructor_queryId($deploy'queryId)));
-    return (($self'owner, $self'counter), ());
+    ($self'owner, $self'seq, $self'challenges)~$SampleTactContract$_fun_notify($DeployOk$_store_cell($DeployOk$_constructor_queryId($deploy'queryId)));
+    return (($self'owner, $self'seq, $self'challenges), ());
 }
 
 ;;
 ;; Get methods of a Contract SampleTactContract
 ;;
 
-_ %counter() method_id(104984) {
+_ %challenges() method_id(78128) {
     var self = $SampleTactContract$_contract_load();
-    var res = self~$SampleTactContract$_fun_counter();
-    return res;
-}
-
-_ %getter() method_id(101268) {
-    var self = $SampleTactContract$_contract_load();
-    var res = self~$SampleTactContract$_fun_getter();
+    var res = self~$SampleTactContract$_fun_challenges();
     return res;
 }
 
@@ -109,7 +69,7 @@ _ supported_interfaces() method_id {
 }
 
 _ get_abi_ipfs() method_id {
-    return "ipfs://QmaagqnSzmxwyYsS2jCp22Sx5p8j3mL2kk9Ngdy9upR3Ez";
+    return "ipfs://QmURyWzB5knUsBqqLjFkwf1myxv8QgDH61ZerMn5yunpB7";
 }
 
 _ lazy_deployment_completed() method_id {
@@ -120,7 +80,7 @@ _ lazy_deployment_completed() method_id {
 ;; Routing of a Contract SampleTactContract
 ;;
 
-((slice, int), int) $SampleTactContract$_contract_router_internal((slice, int) self, int msg_bounced, slice in_msg) impure inline_ref {
+((slice, int, cell), int) $SampleTactContract$_contract_router_internal((slice, int, cell) self, int msg_bounced, slice in_msg) impure inline_ref {
     ;; Handle bounced messages
     if (msg_bounced) {
         return (self, true);
@@ -133,17 +93,10 @@ _ lazy_deployment_completed() method_id {
     }
     
     
-    ;; Receive Add message
-    if (op == 2278832834) {
-        var msg = in_msg~$Add$_load();
-        self~$SampleTactContract$_internal_binary_Add(msg);
-        return (self, true);
-    }
-    
-    ;; Receive Minus message
-    if (op == 2759561417) {
-        var msg = in_msg~$Minus$_load();
-        self~$SampleTactContract$_internal_binary_Minus(msg);
+    ;; Receive CreateChallenge message
+    if (op == 3744466772) {
+        var msg = in_msg~$CreateChallenge$_load();
+        self~$SampleTactContract$_internal_binary_CreateChallenge(msg);
         return (self, true);
     }
     
@@ -158,15 +111,9 @@ _ lazy_deployment_completed() method_id {
     if (op == 0) {
         var text_op = slice_hash(in_msg);
         
-        ;; Receive "increment" message
-        if (text_op == 0xc4f8d72312edfdef5b7bec7833bdbb162d1511bd78a912aed0f2637af65572ae) {
-            self~$SampleTactContract$_internal_text_c4f8d72312edfdef5b7bec7833bdbb162d1511bd78a912aed0f2637af65572ae();
-            return (self, true);
-        }
-        
-        ;; Receive "decrement" message
-        if (text_op == 0x85915b1bf5943fd2853bb660338acacfae39d1f735549cef922255a9945acc3e) {
-            self~$SampleTactContract$_internal_text_85915b1bf5943fd2853bb660338acacfae39d1f735549cef922255a9945acc3e();
+        ;; Receive "join challenge" message
+        if (text_op == 0x9c934179ecdd6d432f5c691bdf4b6356e1c3ce20ad0318d69cc273293fd0b431) {
+            self~$SampleTactContract$_internal_text_9c934179ecdd6d432f5c691bdf4b6356e1c3ce20ad0318d69cc273293fd0b431();
             return (self, true);
         }
     }

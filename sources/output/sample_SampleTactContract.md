@@ -1,6 +1,6 @@
 # TACT Compilation Report
 Contract: SampleTactContract
-BOC Size: 1002 bytes
+BOC Size: 936 bytes
 
 # Types
 Total Types: 8
@@ -29,20 +29,18 @@ Signature: `DeployOk{queryId:uint64}`
 TLB: `factory_deploy#6d0ff13b queryId:uint64 cashback:address = FactoryDeploy`
 Signature: `FactoryDeploy{queryId:uint64,cashback:address}`
 
-## Add
-TLB: `add#87d43ac2 amount:uint32 = Add`
-Signature: `Add{amount:uint32}`
+## Challenge
+TLB: `_ challengeId:uint32 userId:^string gameId:^string betAmount:uint16 = Challenge`
+Signature: `Challenge{challengeId:uint32,userId:^string,gameId:^string,betAmount:uint16}`
 
-## Minus
-TLB: `minus#a47b90c9 amount:uint32 = Minus`
-Signature: `Minus{amount:uint32}`
+## CreateChallenge
+TLB: `create_challenge#df300754 challengeId:uint32 userId:^string gameId:^string = CreateChallenge`
+Signature: `CreateChallenge{challengeId:uint32,userId:^string,gameId:^string}`
 
 # Get Methods
-Total Get Methods: 2
+Total Get Methods: 1
 
-## counter
-
-## getter
+## challenges
 
 # Error Codes
 2: Stack undeflow
@@ -69,4 +67,3 @@ Total Get Methods: 2
 135: Code of a contract was not found
 136: Invalid address
 137: Masterchain support is not enabled for this contract
-4429: Invalid sender

@@ -321,86 +321,109 @@ function dictValueParserFactoryDeploy(): DictionaryValue<FactoryDeploy> {
     }
 }
 
-export type Add = {
-    $$type: 'Add';
-    amount: bigint;
+export type Challenge = {
+    $$type: 'Challenge';
+    challengeId: bigint;
+    userId: string;
+    gameId: string;
+    betAmount: bigint;
 }
 
-export function storeAdd(src: Add) {
+export function storeChallenge(src: Challenge) {
     return (builder: Builder) => {
         let b_0 = builder;
-        b_0.storeUint(2278832834, 32);
-        b_0.storeUint(src.amount, 32);
+        b_0.storeUint(src.challengeId, 32);
+        b_0.storeStringRefTail(src.userId);
+        b_0.storeStringRefTail(src.gameId);
+        b_0.storeUint(src.betAmount, 16);
     };
 }
 
-export function loadAdd(slice: Slice) {
+export function loadChallenge(slice: Slice) {
     let sc_0 = slice;
-    if (sc_0.loadUint(32) !== 2278832834) { throw Error('Invalid prefix'); }
-    let _amount = sc_0.loadUintBig(32);
-    return { $$type: 'Add' as const, amount: _amount };
+    let _challengeId = sc_0.loadUintBig(32);
+    let _userId = sc_0.loadStringRefTail();
+    let _gameId = sc_0.loadStringRefTail();
+    let _betAmount = sc_0.loadUintBig(16);
+    return { $$type: 'Challenge' as const, challengeId: _challengeId, userId: _userId, gameId: _gameId, betAmount: _betAmount };
 }
 
-function loadTupleAdd(source: TupleReader) {
-    let _amount = source.readBigNumber();
-    return { $$type: 'Add' as const, amount: _amount };
+function loadTupleChallenge(source: TupleReader) {
+    let _challengeId = source.readBigNumber();
+    let _userId = source.readString();
+    let _gameId = source.readString();
+    let _betAmount = source.readBigNumber();
+    return { $$type: 'Challenge' as const, challengeId: _challengeId, userId: _userId, gameId: _gameId, betAmount: _betAmount };
 }
 
-function storeTupleAdd(source: Add) {
+function storeTupleChallenge(source: Challenge) {
     let builder = new TupleBuilder();
-    builder.writeNumber(source.amount);
+    builder.writeNumber(source.challengeId);
+    builder.writeString(source.userId);
+    builder.writeString(source.gameId);
+    builder.writeNumber(source.betAmount);
     return builder.build();
 }
 
-function dictValueParserAdd(): DictionaryValue<Add> {
+function dictValueParserChallenge(): DictionaryValue<Challenge> {
     return {
         serialize: (src, buidler) => {
-            buidler.storeRef(beginCell().store(storeAdd(src)).endCell());
+            buidler.storeRef(beginCell().store(storeChallenge(src)).endCell());
         },
         parse: (src) => {
-            return loadAdd(src.loadRef().beginParse());
+            return loadChallenge(src.loadRef().beginParse());
         }
     }
 }
 
-export type Minus = {
-    $$type: 'Minus';
-    amount: bigint;
+export type CreateChallenge = {
+    $$type: 'CreateChallenge';
+    challengeId: bigint;
+    userId: string;
+    gameId: string;
 }
 
-export function storeMinus(src: Minus) {
+export function storeCreateChallenge(src: CreateChallenge) {
     return (builder: Builder) => {
         let b_0 = builder;
-        b_0.storeUint(2759561417, 32);
-        b_0.storeUint(src.amount, 32);
+        b_0.storeUint(3744466772, 32);
+        b_0.storeUint(src.challengeId, 32);
+        b_0.storeStringRefTail(src.userId);
+        b_0.storeStringRefTail(src.gameId);
     };
 }
 
-export function loadMinus(slice: Slice) {
+export function loadCreateChallenge(slice: Slice) {
     let sc_0 = slice;
-    if (sc_0.loadUint(32) !== 2759561417) { throw Error('Invalid prefix'); }
-    let _amount = sc_0.loadUintBig(32);
-    return { $$type: 'Minus' as const, amount: _amount };
+    if (sc_0.loadUint(32) !== 3744466772) { throw Error('Invalid prefix'); }
+    let _challengeId = sc_0.loadUintBig(32);
+    let _userId = sc_0.loadStringRefTail();
+    let _gameId = sc_0.loadStringRefTail();
+    return { $$type: 'CreateChallenge' as const, challengeId: _challengeId, userId: _userId, gameId: _gameId };
 }
 
-function loadTupleMinus(source: TupleReader) {
-    let _amount = source.readBigNumber();
-    return { $$type: 'Minus' as const, amount: _amount };
+function loadTupleCreateChallenge(source: TupleReader) {
+    let _challengeId = source.readBigNumber();
+    let _userId = source.readString();
+    let _gameId = source.readString();
+    return { $$type: 'CreateChallenge' as const, challengeId: _challengeId, userId: _userId, gameId: _gameId };
 }
 
-function storeTupleMinus(source: Minus) {
+function storeTupleCreateChallenge(source: CreateChallenge) {
     let builder = new TupleBuilder();
-    builder.writeNumber(source.amount);
+    builder.writeNumber(source.challengeId);
+    builder.writeString(source.userId);
+    builder.writeString(source.gameId);
     return builder.build();
 }
 
-function dictValueParserMinus(): DictionaryValue<Minus> {
+function dictValueParserCreateChallenge(): DictionaryValue<CreateChallenge> {
     return {
         serialize: (src, buidler) => {
-            buidler.storeRef(beginCell().store(storeMinus(src)).endCell());
+            buidler.storeRef(beginCell().store(storeCreateChallenge(src)).endCell());
         },
         parse: (src) => {
-            return loadMinus(src.loadRef().beginParse());
+            return loadCreateChallenge(src.loadRef().beginParse());
         }
     }
 }
@@ -408,22 +431,24 @@ function dictValueParserMinus(): DictionaryValue<Minus> {
  type SampleTactContract_init_args = {
     $$type: 'SampleTactContract_init_args';
     owner: Address;
+    seq: bigint;
 }
 
 function initSampleTactContract_init_args(src: SampleTactContract_init_args) {
     return (builder: Builder) => {
         let b_0 = builder;
         b_0.storeAddress(src.owner);
+        b_0.storeInt(src.seq, 257);
     };
 }
 
-async function SampleTactContract_init(owner: Address) {
-    const __code = Cell.fromBase64('te6ccgECGwEAA94AART/APSkE/S88sgLAQIBYgIDAtTQAdDTAwFxsKMB+kABINdJgQELuvLgiCDXCwoggQT/uvLQiYMJuvLgiFRQUwNvBPhhAvhi2zxa2zzy4ILI+EMBzH8BygBZWSDXSYEBC7ry4Igg1wsKIIEE/7ry0ImDCbry4IjPFssfye1UFgQCAVgQEQTE7aLt+wGSMH/gcCHXScIflTAg1wsf3iCCEIfUOsK6jpUw0x8BghCH1DrCuvLggdMfATHbPH/gIIIQpHuQybqOlTDTHwGCEKR7kMm68uCB0x8BMds8f+AgghCUapi2uuMCwAAICwUGAVAw0x8BghCUapi2uvLggdM/ATHIAYIQr/kPV1jLH8s/yfhCAXBt2zx/DQEKkTDjDXAHBLb5ASCC8MT41yMS7f3vW3vseDO9uxYtFRG9eKkSrtDyY3r2VXKuuo+PMHHbPIj4QgF/bds8f9sx4ILwhZFbG/WUP9KFO7ZgM4rKz6450fc1VJzvkiJVqZRazD66CAkNCgAk+EFvJBAjXwMjgRFNAscF8vSgAB4AAAAAaW5jcmVtZW50ZWQDIo+Ocds8iPhCAX9t2zx/2zHgCwwNACT4QW8kECNfAyOBEU0CxwXy9KEAHgAAAABkZWNyZW1lbnRlZAE6bW0ibrOZWyBu8tCAbyIBkTLiECRwAwSAQlAj2zwOAcrIcQHKAVAHAcoAcAHKAlAFINdJgQELuvLgiCDXCwoggQT/uvLQiYMJuvLgiM8WUAP6AnABymgjbrORf5MkbrPilzMzAXABygDjDSFus5x/AcoAASBu8tCAAcyVMXABygDiyQH7AA8AmH8BygDIcAHKAHABygAkbrOdfwHKAAQgbvLQgFAEzJY0A3ABygDiJG6znX8BygAEIG7y0IBQBMyWNANwAcoA4nABygACfwHKAALJWMwCASASEwIBSBkaAgEgFBUAlbd6ME4LnYerpZXPY9CdhzrJUKNs0E4TusalpWyPlmRadeW/vixHME4ECrgDcAzscpnLB1XI5LZYcE4TsunLVmnZbmdB0s2yjN0UkAIRsuU2zzbPGwhgFhcCEbKGNs82zxsIYBYXAcDtRNDUAfhj0gABjiX6QAEg10mBAQu68uCIINcLCiCBBP+68tCJgwm68uCIAdMfWWwS4Pgo1wsKgwm68uCJ+kABINdJgQELuvLgiCDXCwoggQT/uvLQiYMJuvLgiAHR2zwYAAIgAAJwABGwr7tRNDSAAGAAdbJu40NWlwZnM6Ly9RbWFhZ3FuU3pteHd5WXNTMmpDcDIyU3g1cDhqM21MMmtrOU5nZHk5dXBSM0V6gg');
-    const __system = Cell.fromBase64('te6cckECHQEAA+gAAQHAAQEFoebTAgEU/wD0pBP0vPLICwMCAWIOBAIBWAgFAgFIBwYAdbJu40NWlwZnM6Ly9RbWFhZ3FuU3pteHd5WXNTMmpDcDIyU3g1cDhqM21MMmtrOU5nZHk5dXBSM0V6ggABGwr7tRNDSAAGACASAKCQCVt3owTgudh6ullc9j0J2HOslQo2zQThO6xqWlbI+WZFp15b++LEcwTgQKuANwDOxymcsHVcjktlhwThOy6ctWadluZ0HSzbKM3RSQAgEgDAsCEbKGNs82zxsIYBsNAhGy5TbPNs8bCGAbDQACIALU0AHQ0wMBcbCjAfpAASDXSYEBC7ry4Igg1wsKIIEE/7ry0ImDCbry4IhUUFMDbwT4YQL4Yts8Wts88uCCyPhDAcx/AcoAWVkg10mBAQu68uCIINcLCiCBBP+68tCJgwm68uCIzxbLH8ntVBsPBMTtou37AZIwf+BwIddJwh+VMCDXCx/eIIIQh9Q6wrqOlTDTHwGCEIfUOsK68uCB0x8BMds8f+AgghCke5DJuo6VMNMfAYIQpHuQybry4IHTHwEx2zx/4CCCEJRqmLa64wLAABoZFRABCpEw4w1wEQS2+QEggvDE+NcjEu3971t77HgzvbsWLRURvXipEq7Q8mN69lVyrrqPjzBx2zyI+EIBf23bPH/bMeCC8IWRWxv1lD/ShTu2YDOKys+uOdH3NVSc75IiVamUWsw+uhoUFhIDIo+Ocds8iPhCAX9t2zx/2zHgGRMWAB4AAAAAZGVjcmVtZW50ZWQAHgAAAABpbmNyZW1lbnRlZAFQMNMfAYIQlGqYtrry4IHTPwExyAGCEK/5D1dYyx/LP8n4QgFwbds8fxYBOm1tIm6zmVsgbvLQgG8iAZEy4hAkcAMEgEJQI9s8FwHKyHEBygFQBwHKAHABygJQBSDXSYEBC7ry4Igg1wsKIIEE/7ry0ImDCbry4IjPFlAD+gJwAcpoI26zkX+TJG6z4pczMwFwAcoA4w0hbrOcfwHKAAEgbvLQgAHMlTFwAcoA4skB+wAYAJh/AcoAyHABygBwAcoAJG6znX8BygAEIG7y0IBQBMyWNANwAcoA4iRus51/AcoABCBu8tCAUATMljQDcAHKAOJwAcoAAn8BygACyVjMACT4QW8kECNfAyOBEU0CxwXy9KEAJPhBbyQQI18DI4ERTQLHBfL0oAHA7UTQ1AH4Y9IAAY4l+kABINdJgQELuvLgiCDXCwoggQT/uvLQiYMJuvLgiAHTH1lsEuD4KNcLCoMJuvLgifpAASDXSYEBC7ry4Igg1wsKIIEE/7ry0ImDCbry4IgB0ds8HAACcMyoSzE=');
+async function SampleTactContract_init(owner: Address, seq: bigint) {
+    const __code = Cell.fromBase64('te6ccgECFAEAA5wAART/APSkE/S88sgLAQIBYgIDAt7QAdDTAwFxsKMB+kABINdJgQELuvLgiCDXCwoggQT/uvLQiYMJuvLgiFRQUwNvBPhhAvhi2zxVEts88uCCyPhDAcx/AcoAVSBaINdJgQELuvLgiCDXCwoggQT/uvLQiYMJuvLgiM8WEssP9ADJ7VQNBAIBIAsMA+ztou37AZIwf+BwIddJwh+VMCDXCx/eIIIQ3zAHVLqPVDDTHwGCEN8wB1S68uCB0x/UAdAB1AHQQzBsEyJZdVUggQEBBMhVMFA0yx/IWM8WyQHMyFjPFskBzMsPyRIgbpUwWfRaMJRBM/QV4oj4QgF/bds8f+AgBQgGACwAAAAAQ2hhbGxlbmdlIENyZWF0ZWQuA9qCEJRqmLa6jqgw0x8BghCUapi2uvLggdM/ATHIAYIQr/kPV1jLH8s/yfhCAXBt2zx/4MAAjzP5AYLwnJNBeezdbUMvXGkb30tjVuHDziCtAxjWnMJzKT/QtDG6jwuI+EIBf23bPH/bMeCRMOJwCAcIACoAAAAAQ2hhbGxlbmdlIEpvaW5lZC4BOm1tIm6zmVsgbvLQgG8iAZEy4hAkcAMEgEJQI9s8CQHKyHEBygFQBwHKAHABygJQBSDXSYEBC7ry4Igg1wsKIIEE/7ry0ImDCbry4IjPFlAD+gJwAcpoI26zkX+TJG6z4pczMwFwAcoA4w0hbrOcfwHKAAEgbvLQgAHMlTFwAcoA4skB+wAKAJh/AcoAyHABygBwAcoAJG6znX8BygAEIG7y0IBQBMyWNANwAcoA4iRus51/AcoABCBu8tCAUATMljQDcAHKAOJwAcoAAn8BygACyVjMAhG9iYbZ5tnjYYwNDgIBIBARAdbtRNDUAfhj0gABjij6QAEg10mBAQu68uCIINcLCiCBBP+68tCJgwm68uCIAdMP9ARVIGwT4Pgo1wsKgwm68uCJ+kABINdJgQELuvLgiCDXCwoggQT/uvLQiYMJuvLgiAGBAQHXAFkC0QHbPA8AAiAAAm0Albu9GCcFzsPV0srnsehOw51kqFG2aCcJ3WNS0rZHyzItOvLf3xYjmCcCBVwBuAZ2OUzlg6rkclssOCcJ2XTlqzTstzOg6WbZRm6KSAIBSBITABGwr7tRNDSAAGAAdbJu40NWlwZnM6Ly9RbVVSeVd6QjVrblVzQnFxTGpGa3dmMW15eHY4UWdESDYxWmVyTW41eXVucEI3gg');
+    const __system = Cell.fromBase64('te6cckECFgEAA6YAAQHAAQEFoebTAgEU/wD0pBP0vPLICwMCAWIMBAIBIAoFAgEgCQYCAUgIBwB1sm7jQ1aXBmczovL1FtVVJ5V3pCNWtuVXNCcXFMakZrd2YxbXl4djhRZ0RINjFaZXJNbjV5dW5wQjeCAAEbCvu1E0NIAAYACVu70YJwXOw9XSyuex6E7DnWSoUbZoJwndY1LStkfLMi068t/fFiOYJwIFXAG4BnY5TOWDquRyWyw4JwnZdOWrNOy3M6DpZtlGbopIAhG9iYbZ5tnjYYwUCwACIALe0AHQ0wMBcbCjAfpAASDXSYEBC7ry4Igg1wsKIIEE/7ry0ImDCbry4IhUUFMDbwT4YQL4Yts8VRLbPPLggsj4QwHMfwHKAFUgWiDXSYEBC7ry4Igg1wsKIIEE/7ry0ImDCbry4IjPFhLLD/QAye1UFA0D7O2i7fsBkjB/4HAh10nCH5UwINcLH94gghDfMAdUuo9UMNMfAYIQ3zAHVLry4IHTH9QB0AHUAdBDMGwTIll1VSCBAQEEyFUwUDTLH8hYzxbJAczIWM8WyQHMyw/JEiBulTBZ9FowlEEz9BXiiPhCAX9t2zx/4CATEA4D2oIQlGqYtrqOqDDTHwGCEJRqmLa68uCB0z8BMcgBghCv+Q9XWMsfyz/J+EIBcG3bPH/gwACPM/kBgvCck0F57N1tQy9caRvfS2NW4cPOIK0DGNacwnMpP9C0MbqPC4j4QgF/bds8f9sx4JEw4nAQDxAAKgAAAABDaGFsbGVuZ2UgSm9pbmVkLgE6bW0ibrOZWyBu8tCAbyIBkTLiECRwAwSAQlAj2zwRAcrIcQHKAVAHAcoAcAHKAlAFINdJgQELuvLgiCDXCwoggQT/uvLQiYMJuvLgiM8WUAP6AnABymgjbrORf5MkbrPilzMzAXABygDjDSFus5x/AcoAASBu8tCAAcyVMXABygDiyQH7ABIAmH8BygDIcAHKAHABygAkbrOdfwHKAAQgbvLQgFAEzJY0A3ABygDiJG6znX8BygAEIG7y0IBQBMyWNANwAcoA4nABygACfwHKAALJWMwALAAAAABDaGFsbGVuZ2UgQ3JlYXRlZC4B1u1E0NQB+GPSAAGOKPpAASDXSYEBC7ry4Igg1wsKIIEE/7ry0ImDCbry4IgB0w/0BFUgbBPg+CjXCwqDCbry4In6QAEg10mBAQu68uCIINcLCiCBBP+68tCJgwm68uCIAYEBAdcAWQLRAds8FQACbbehjlQ=');
     let builder = beginCell();
     builder.storeRef(__system);
     builder.storeUint(0, 1);
-    initSampleTactContract_init_args({ $$type: 'SampleTactContract_init_args', owner })(builder);
+    initSampleTactContract_init_args({ $$type: 'SampleTactContract_init_args', owner, seq })(builder);
     const __data = builder.endCell();
     return { code: __code, data: __data };
 }
@@ -453,7 +478,6 @@ const SampleTactContract_errors: { [key: number]: { message: string } } = {
     135: { message: `Code of a contract was not found` },
     136: { message: `Invalid address` },
     137: { message: `Masterchain support is not enabled for this contract` },
-    4429: { message: `Invalid sender` },
 }
 
 const SampleTactContract_types: ABIType[] = [
@@ -463,31 +487,28 @@ const SampleTactContract_types: ABIType[] = [
     {"name":"Deploy","header":2490013878,"fields":[{"name":"queryId","type":{"kind":"simple","type":"uint","optional":false,"format":64}}]},
     {"name":"DeployOk","header":2952335191,"fields":[{"name":"queryId","type":{"kind":"simple","type":"uint","optional":false,"format":64}}]},
     {"name":"FactoryDeploy","header":1829761339,"fields":[{"name":"queryId","type":{"kind":"simple","type":"uint","optional":false,"format":64}},{"name":"cashback","type":{"kind":"simple","type":"address","optional":false}}]},
-    {"name":"Add","header":2278832834,"fields":[{"name":"amount","type":{"kind":"simple","type":"uint","optional":false,"format":32}}]},
-    {"name":"Minus","header":2759561417,"fields":[{"name":"amount","type":{"kind":"simple","type":"uint","optional":false,"format":32}}]},
+    {"name":"Challenge","header":null,"fields":[{"name":"challengeId","type":{"kind":"simple","type":"uint","optional":false,"format":32}},{"name":"userId","type":{"kind":"simple","type":"string","optional":false}},{"name":"gameId","type":{"kind":"simple","type":"string","optional":false}},{"name":"betAmount","type":{"kind":"simple","type":"uint","optional":false,"format":16}}]},
+    {"name":"CreateChallenge","header":3744466772,"fields":[{"name":"challengeId","type":{"kind":"simple","type":"uint","optional":false,"format":32}},{"name":"userId","type":{"kind":"simple","type":"string","optional":false}},{"name":"gameId","type":{"kind":"simple","type":"string","optional":false}}]},
 ]
 
 const SampleTactContract_getters: ABIGetter[] = [
-    {"name":"counter","arguments":[],"returnType":{"kind":"simple","type":"int","optional":false,"format":257}},
-    {"name":"getter","arguments":[],"returnType":{"kind":"simple","type":"int","optional":false,"format":257}},
+    {"name":"challenges","arguments":[],"returnType":{"kind":"dict","key":"int","value":"Challenge","valueFormat":"ref"}},
 ]
 
 const SampleTactContract_receivers: ABIReceiver[] = [
-    {"receiver":"internal","message":{"kind":"typed","type":"Add"}},
-    {"receiver":"internal","message":{"kind":"typed","type":"Minus"}},
-    {"receiver":"internal","message":{"kind":"text","text":"increment"}},
-    {"receiver":"internal","message":{"kind":"text","text":"decrement"}},
+    {"receiver":"internal","message":{"kind":"typed","type":"CreateChallenge"}},
+    {"receiver":"internal","message":{"kind":"text","text":"join challenge"}},
     {"receiver":"internal","message":{"kind":"typed","type":"Deploy"}},
 ]
 
 export class SampleTactContract implements Contract {
     
-    static async init(owner: Address) {
-        return await SampleTactContract_init(owner);
+    static async init(owner: Address, seq: bigint) {
+        return await SampleTactContract_init(owner, seq);
     }
     
-    static async fromInit(owner: Address) {
-        const init = await SampleTactContract_init(owner);
+    static async fromInit(owner: Address, seq: bigint) {
+        const init = await SampleTactContract_init(owner, seq);
         const address = contractAddress(0, init);
         return new SampleTactContract(address, init);
     }
@@ -510,19 +531,13 @@ export class SampleTactContract implements Contract {
         this.init = init;
     }
     
-    async send(provider: ContractProvider, via: Sender, args: { value: bigint, bounce?: boolean| null | undefined }, message: Add | Minus | 'increment' | 'decrement' | Deploy) {
+    async send(provider: ContractProvider, via: Sender, args: { value: bigint, bounce?: boolean| null | undefined }, message: CreateChallenge | 'join challenge' | Deploy) {
         
         let body: Cell | null = null;
-        if (message && typeof message === 'object' && !(message instanceof Slice) && message.$$type === 'Add') {
-            body = beginCell().store(storeAdd(message)).endCell();
+        if (message && typeof message === 'object' && !(message instanceof Slice) && message.$$type === 'CreateChallenge') {
+            body = beginCell().store(storeCreateChallenge(message)).endCell();
         }
-        if (message && typeof message === 'object' && !(message instanceof Slice) && message.$$type === 'Minus') {
-            body = beginCell().store(storeMinus(message)).endCell();
-        }
-        if (message === 'increment') {
-            body = beginCell().storeUint(0, 32).storeStringTail(message).endCell();
-        }
-        if (message === 'decrement') {
+        if (message === 'join challenge') {
             body = beginCell().storeUint(0, 32).storeStringTail(message).endCell();
         }
         if (message && typeof message === 'object' && !(message instanceof Slice) && message.$$type === 'Deploy') {
@@ -534,17 +549,10 @@ export class SampleTactContract implements Contract {
         
     }
     
-    async getCounter(provider: ContractProvider) {
+    async getChallenges(provider: ContractProvider) {
         let builder = new TupleBuilder();
-        let source = (await provider.get('counter', builder.build())).stack;
-        let result = source.readBigNumber();
-        return result;
-    }
-    
-    async getGetter(provider: ContractProvider) {
-        let builder = new TupleBuilder();
-        let source = (await provider.get('getter', builder.build())).stack;
-        let result = source.readBigNumber();
+        let source = (await provider.get('challenges', builder.build())).stack;
+        let result = Dictionary.loadDirect(Dictionary.Keys.BigInt(257), dictValueParserChallenge(), source.readCellOpt());
         return result;
     }
     

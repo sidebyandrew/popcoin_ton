@@ -4,6 +4,8 @@
     "build": "tact --config ./tact.config.json",
     "test": "jest",
     "deploy": "ts-node ./sources/contract.deploy.ts",
+    "challenge_create": "ts-node ./sources/contract.challenge.create.ts",
+    "challenge_join": "ts-node ./sources/contract.challenge.join.ts",
     "read": "ts-node ./sources/contract.read.ts",
     "write": "ts-node ./sources/contract.write.ts",
     "send_msg": "ts-node ./sources/contract.send.msg.ts"

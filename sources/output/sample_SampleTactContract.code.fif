@@ -7,12 +7,13 @@ PROGRAM{
   DECLPROC __tact_context_get
   DECLPROC __tact_context_get_sender
   DECLPROC __tact_store_bool
-  DECLPROC __tact_slice_eq_bits
+  DECLPROC __tact_dict_set_int_cell
   DECLPROC $Deploy$_load
   DECLPROC $DeployOk$_store
   DECLPROC $DeployOk$_store_cell
-  DECLPROC $Add$_load
-  DECLPROC $Minus$_load
+  DECLPROC $Challenge$_store
+  DECLPROC $Challenge$_store_cell
+  DECLPROC $CreateChallenge$_load
   DECLPROC $SampleTactContract$_store
   DECLPROC $SampleTactContract$_load
   DECLPROC $StateInit$_not_null
@@ -21,22 +22,17 @@ PROGRAM{
   DECLPROC $SampleTactContract$_contract_load
   DECLPROC $SampleTactContract$_contract_store
   DECLPROC $global_send
-  DECLPROC $SampleTactContract$_fun_add
-  DECLPROC $SampleTactContract$_fun_minus
-  DECLPROC $SampleTactContract$_fun_counter
-  DECLPROC $SampleTactContract$_fun_getter
+  DECLPROC $SampleTactContract$_fun_challenges
   DECLPROC $SendParameters$_constructor_bounce_to_value_mode_body_code_data
   DECLPROC $SampleTactContract$_fun_forward
   DECLPROC $SampleTactContract$_fun_reply
   DECLPROC $SampleTactContract$_fun_notify
+  DECLPROC $Challenge$_constructor_challengeId_userId_gameId_betAmount
   DECLPROC $DeployOk$_constructor_queryId
-  DECLPROC $SampleTactContract$_internal_binary_Add
-  DECLPROC $SampleTactContract$_internal_binary_Minus
-  DECLPROC $SampleTactContract$_internal_text_c4f8d72312edfdef5b7bec7833bdbb162d1511bd78a912aed0f2637af65572ae
-  DECLPROC $SampleTactContract$_internal_text_85915b1bf5943fd2853bb660338acacfae39d1f735549cef922255a9945acc3e
+  DECLPROC $SampleTactContract$_internal_binary_CreateChallenge
+  DECLPROC $SampleTactContract$_internal_text_9c934179ecdd6d432f5c691bdf4b6356e1c3ce20ad0318d69cc273293fd0b431
   DECLPROC $SampleTactContract$_internal_binary_Deploy
-  104984 DECLMETHOD %counter
-  101268 DECLMETHOD %getter
+  78128 DECLMETHOD %challenges
   113617 DECLMETHOD supported_interfaces
   121275 DECLMETHOD get_abi_ipfs
   115390 DECLMETHOD lazy_deployment_completed
@@ -91,8 +87,18 @@ PROGRAM{
     SWAP
     1 STI
   }>
-  __tact_slice_eq_bits PROCINLINE:<{
-    SDEQ
+  __tact_dict_set_int_cell PROCINLINE:<{
+    DUP
+    ISNULL
+    IF:<{
+      DROP
+      -ROT
+      DICTIDEL
+      DROP
+    }>ELSE<{
+      s1 s3 s3 XCHG3
+      DICTISETREF
+    }>
   }>
   $Deploy$_load PROCINLINE:<{
     32 LDU
@@ -115,34 +121,58 @@ PROGRAM{
     $DeployOk$_store INLINECALLDICT
     ENDC
   }>
-  $Add$_load PROCINLINE:<{
-    32 LDU
+  $Challenge$_store PROCINLINE:<{
+    s3 s4 XCHG2
+    32 STU
+    NEWC
+    ROT
+    STSLICER
+    ENDC
     SWAP
-    2278832834 PUSHINT
-    EQUAL
-    129 THROWIFNOT
-    32 LDU
+    STREF
+    NEWC
+    ROT
+    STSLICER
+    ENDC
     SWAP
+    STREF
+    16 STU
   }>
-  $Minus$_load PROCINLINE:<{
+  $Challenge$_store_cell PROCINLINE:<{
+    NEWC
+    4 -ROLL
+    $Challenge$_store INLINECALLDICT
+    ENDC
+  }>
+  $CreateChallenge$_load PROCINLINE:<{
     32 LDU
     SWAP
-    2759561417 PUSHINT
+    3744466772 PUSHINT
     EQUAL
     129 THROWIFNOT
     32 LDU
+    LDREF
     SWAP
+    CTOS
+    SWAP
+    LDREF
+    SWAP
+    CTOS
+    s3 s3 s0 XCHG3
   }>
   $SampleTactContract$_store PROCINLINE:<{
-    -ROT
+    2SWAP
     __tact_store_address INLINECALLDICT
-    32 STU
+    s1 s2 XCHG
+    16 STU
+    STDICT
   }>
   $SampleTactContract$_load PROCINLINE:<{
     __tact_load_address INLINECALLDICT
     SWAP
-    32 LDU
-    -ROT
+    16 LDU
+    LDDICT
+    3 -ROLL
   }>
   $StateInit$_not_null PROCINLINE:<{
     DUP
@@ -152,9 +182,13 @@ PROGRAM{
   }>
   $SampleTactContract$init$_load PROCINLINE:<{
     __tact_load_address INLINECALLDICT
+    SWAP
+    257 PUSHINT
+    LDIX
+    -ROT
   }>
   $SampleTactContract$_contract_init PROCREF:<{
-    0 PUSHINT
+    PUSHNULL
   }>
   $SampleTactContract$_contract_load PROCREF:<{
     c4 PUSH
@@ -166,7 +200,7 @@ PROGRAM{
     SWAP
     IFJMP:<{
       $SampleTactContract$_load INLINECALLDICT
-      1 2 BLKDROP2
+      1 3 BLKDROP2
     }>
     MYADDR
     11 PLDU
@@ -174,8 +208,9 @@ PROGRAM{
     EQUAL
     137 THROWIFNOT
     $SampleTactContract$init$_load INLINECALLDICT
-    SWAP
+    s0 s2 XCHG
     ENDS
+    SWAP
     $SampleTactContract$_contract_init INLINECALLDICT
   }>
   $SampleTactContract$_contract_store PROCINLINE:<{
@@ -186,7 +221,7 @@ PROGRAM{
     TRUE
     SWAP
     1 STI
-    -ROT
+    3 -ROLL
     $SampleTactContract$_store INLINECALLDICT
     ENDC
     c4 POP
@@ -293,32 +328,7 @@ PROGRAM{
     SWAP
     SENDRAWMSG
   }>
-  $SampleTactContract$_fun_add PROCREF:<{
-    __tact_context_get INLINECALLDICT
-    s2 s3 XCHG
-    3 BLKDROP
-    s3 PUSH
-    4429 PUSHINT
-    s0 s2 XCHG
-    __tact_slice_eq_bits INLINECALLDICT
-    THROWANYIFNOT
-    ADD
-  }>
-  $SampleTactContract$_fun_minus PROCREF:<{
-    __tact_context_get INLINECALLDICT
-    s2 s3 XCHG
-    3 BLKDROP
-    s3 PUSH
-    4429 PUSHINT
-    s0 s2 XCHG
-    __tact_slice_eq_bits INLINECALLDICT
-    THROWANYIFNOT
-    SUB
-  }>
-  $SampleTactContract$_fun_counter PROCREF:<{
-    DUP
-  }>
-  $SampleTactContract$_fun_getter PROCREF:<{
+  $SampleTactContract$_fun_challenges PROCREF:<{
     DUP
   }>
   $SendParameters$_constructor_bounce_to_value_mode_body_code_data PROCINLINE:<{
@@ -359,24 +369,26 @@ PROGRAM{
     PUSHNULL
     $SampleTactContract$_fun_forward INLINECALLDICT
   }>
+  $Challenge$_constructor_challengeId_userId_gameId_betAmount PROCINLINE:<{
+  }>
   $DeployOk$_constructor_queryId PROCINLINE:<{
   }>
-  $SampleTactContract$_internal_binary_Add PROCINLINE:<{
-    $SampleTactContract$_fun_add INLINECALLDICT
-  }>
-  $SampleTactContract$_internal_binary_Minus PROCINLINE:<{
-    $SampleTactContract$_fun_minus INLINECALLDICT
-  }>
-  $SampleTactContract$_internal_text_c4f8d72312edfdef5b7bec7833bdbb162d1511bd78a912aed0f2637af65572ae PROCINLINE:<{
-    1 PUSHINT
-    $SampleTactContract$_fun_add INLINECALLDICT
-    B{b5ee9c7241010101001100001e00000000696e6372656d656e7465648430bf20} B>boc PUSHREF
+  $SampleTactContract$_internal_binary_CreateChallenge PROCINLINE:<{
+    s2 PUSH
+    -ROT
+    5 PUSHINT
+    $Challenge$_constructor_challengeId_userId_gameId_betAmount INLINECALLDICT
+    3 -ROLL
+    257 PUSHINT
+    s0 s4 XCHG
+    $Challenge$_store_cell INLINECALLDICT
+    s1 s2 XCHG
+    __tact_dict_set_int_cell INLINECALLDICT
+    B{b5ee9c7241010101001800002c000000004368616c6c656e676520437265617465642e3e727a8e} B>boc PUSHREF
     $SampleTactContract$_fun_reply INLINECALLDICT
   }>
-  $SampleTactContract$_internal_text_85915b1bf5943fd2853bb660338acacfae39d1f735549cef922255a9945acc3e PROCINLINE:<{
-    1 PUSHINT
-    $SampleTactContract$_fun_minus INLINECALLDICT
-    B{b5ee9c7241010101001100001e0000000064656372656d656e7465647f812353} B>boc PUSHREF
+  $SampleTactContract$_internal_text_9c934179ecdd6d432f5c691bdf4b6356e1c3ce20ad0318d69cc273293fd0b431 PROCINLINE:<{
+    B{b5ee9c7241010101001700002a000000004368616c6c656e6765204a6f696e65642efcf32d6c} B>boc PUSHREF
     $SampleTactContract$_fun_reply INLINECALLDICT
   }>
   $SampleTactContract$_internal_binary_Deploy PROCINLINE:<{
@@ -384,15 +396,10 @@ PROGRAM{
     $DeployOk$_store_cell INLINECALLDICT
     $SampleTactContract$_fun_notify INLINECALLDICT
   }>
-  %counter PROC:<{
+  %challenges PROC:<{
     $SampleTactContract$_contract_load INLINECALLDICT
-    $SampleTactContract$_fun_counter INLINECALLDICT
-    2 1 BLKDROP2
-  }>
-  %getter PROC:<{
-    $SampleTactContract$_contract_load INLINECALLDICT
-    $SampleTactContract$_fun_getter INLINECALLDICT
-    2 1 BLKDROP2
+    $SampleTactContract$_fun_challenges INLINECALLDICT
+    3 1 BLKDROP2
   }>
   supported_interfaces PROC:<{
     123515602279859691144772641439386770278 PUSHINT
@@ -401,7 +408,7 @@ PROGRAM{
     209474421377847335869795010607481022628 PUSHINT
   }>
   get_abi_ipfs PROC:<{
-    x{697066733a2f2f516d616167716e537a6d787779597353326a4370323253783570386a336d4c326b6b394e6764793975705233457a} PUSHSLICE
+    x{697066733a2f2f516d555279577a42356b6e55734271714c6a466b7766316d797876385167444836315a65724d6e3579756e704237} PUSHSLICE
   }>
   lazy_deployment_completed PROC:<{
     c4 PUSH
@@ -427,23 +434,13 @@ PROGRAM{
       32 PLDU
     }>
     DUP
-    2278832834 PUSHINT
+    3744466772 PUSHINT
     EQUAL
     IFJMP:<{
       DROP
-      $Add$_load INLINECALLDICT
-      NIP
-      $SampleTactContract$_internal_binary_Add INLINECALLDICT
-      TRUE
-    }>
-    DUP
-    2759561417 PUSHINT
-    EQUAL
-    IFJMP:<{
-      DROP
-      $Minus$_load INLINECALLDICT
-      NIP
-      $SampleTactContract$_internal_binary_Minus INLINECALLDICT
+      $CreateChallenge$_load INLINECALLDICT
+      1 3 BLKDROP2
+      $SampleTactContract$_internal_binary_CreateChallenge INLINECALLDICT
       TRUE
     }>
     DUP
@@ -459,19 +456,10 @@ PROGRAM{
     0 EQINT
     IF:<{
       HASHSU
-      DUP
-      89092981215441470209245890604563109773385607357076622359718516871332286001838 PUSHINT
+      70820982798122857733106333153494107333981377409119881755427386771976848716849 PUSHINT
       EQUAL
       IFJMP:<{
-        DROP
-        $SampleTactContract$_internal_text_c4f8d72312edfdef5b7bec7833bdbb162d1511bd78a912aed0f2637af65572ae INLINECALLDICT
-        TRUE
-        RETALT
-      }>
-      60414430498665911021786040396987709422365243451461403364463093175528667663422 PUSHINT
-      EQUAL
-      IFJMP:<{
-        $SampleTactContract$_internal_text_85915b1bf5943fd2853bb660338acacfae39d1f735549cef922255a9945acc3e INLINECALLDICT
+        $SampleTactContract$_internal_text_9c934179ecdd6d432f5c691bdf4b6356e1c3ce20ad0318d69cc273293fd0b431 INLINECALLDICT
         TRUE
         RETALT
       }>
@@ -499,7 +487,7 @@ PROGRAM{
     s0 s2 XCHG
     __tact_context_sender SETGLOB
     $SampleTactContract$_contract_load INLINECALLDICT
-    2SWAP
+    2 3 BLKSWAP
     $SampleTactContract$_contract_router_internal INLINECALLDICT
     130 THROWIFNOT
     $SampleTactContract$_contract_store INLINECALLDICT

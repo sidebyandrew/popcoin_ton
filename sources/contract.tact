@@ -1,66 +1,67 @@
 import "@stdlib/deploy";
 
-message Add {
-    amount: Int as uint32;
+struct Challenge {
+        challengeId:Int as uint32;
+        userId:String;
+        gameId:String;
+        betAmount:Int as uint16;
 }
 
+ message CreateChallenge {
+           challengeId:Int as uint32;
+           userId:String;
+           gameId:String;
 
-message Minus {
-    amount: Int as uint32;
 }
-
 
 contract SampleTactContract with Deployable {
 
+//  ==================== Contract Status Section Start  ====================
     owner: Address;
-    counter: Int as uint32;
-
-    init(owner: Address) {
+    seq: Int as uint16;
+    init(owner: Address, seq: Int) {
         self.owner = owner;
-        self.counter = 0;
+        self.seq = seq;
     }
 
-    fun add(v: Int) {
-        // Check sender
-        let ctx: Context = context();
-        require(ctx.sender == self.owner, "Invalid sender");
-        
-        // Update counter
-        self.counter = (self.counter + v);
+    challenges: map<Int, Challenge>;
+//   ################## Contract Status Section End  #########################
+
+
+//  ==================== Binary Msg Section Start  ====================
+    receive(msg: CreateChallenge) {
+       let c: Challenge = Challenge{
+           challengeId: msg.challengeId,
+           userId: msg.userId,
+           gameId: msg.gameId,
+           betAmount:5
+       };
+
+       self.challenges.set(msg.challengeId, c);
+       self.reply(("Challenge Created.").asComment());
     }
+//  ################## Binary Msg Section End  #########################
 
-     fun minus(v: Int) {
-            // Check sender
-         let ctx: Context = context();
-         require(ctx.sender == self.owner, "Invalid sender");
 
-         // Update counter
-         self.counter = (self.counter - v);
-     }
-
-    receive(msg: Add) {
-        self.add(msg.amount);
+//  ==================== Textual Msg Section Start  ====================
+    receive("join challenge") {
+        self.reply("Challenge Joined.".asComment());
     }
+//  ################## Textual Msg Section End  #########################
 
-    receive(msg: Minus) {
-        self.minus(msg.amount);
+
+
+
+//  ------------------------ Internal Function Start ------------------------
+
+//  ################## Internal Function End #########################
+
+
+
+//  ------------------------ Getter Start ------------------------
+    get fun challenges():map<Int, Challenge> {
+        return self.challenges;
     }
+//  ################## Getter End #########################
 
-    receive("increment") {
-        self.add(1);
-        self.reply("incremented".asComment());
-    }
-
-     receive("decrement") {
-         self.minus(1);
-         self.reply("decremented".asComment());
-     }
-
-    get fun counter(): Int {
-        return self.counter;
-    }
-
-    get fun getter(): Int {
-        return self.counter;
-    }
 }

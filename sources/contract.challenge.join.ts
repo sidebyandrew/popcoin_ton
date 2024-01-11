@@ -27,15 +27,15 @@ const Sleep = (ms: number)=> {
 
     // open the contract address
     let owner = Address.parse(_OWNER);
-    let init = await SampleTactContract.init(owner);
+    let init = await SampleTactContract.init(owner,1n);
     let contract_address = contractAddress(0, init);
     let contract = await SampleTactContract.fromAddress(contract_address);
     let contract_open = await client.open(contract);
 
     // send message to contract
-    await contract_open.send(walletSender, { value: toNano("0.01") }, "increment");
+    await contract_open.send(walletSender, { value: toNano("0.05") }, "join challenge");
 
     await Sleep(3000);
-    console.log("Counter Value: " + (await contract_open.getCounter()));
+    console.log("getChallenges: " + (await contract_open.getChallenges()));
 })();
 

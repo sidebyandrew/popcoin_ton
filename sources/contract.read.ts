@@ -12,7 +12,7 @@ import {_ENDPOINT_MAINNET, _ENDPOINT_TESTNET, _OWNER, _TEST_ONLY} from "./global
     let testnet = true;
     let packageName = "sample_SampleTactContract.pkg";
     let owner = Address.parse(_OWNER);
-    let init = await SampleTactContract.init(owner);
+    let init = await SampleTactContract.init(owner,1n);
     let contract_address = contractAddress(0, init);
 
     // Preparing
@@ -22,6 +22,5 @@ import {_ENDPOINT_MAINNET, _ENDPOINT_TESTNET, _OWNER, _TEST_ONLY} from "./global
     // Input the contract address
     let contract = await SampleTactContract.fromAddress(contract_address);
     let contract_open = await client.open(contract);
-    console.log("Counter Value with counter(): " + (await contract_open.getCounter()));
-    console.log("Counter Value with getter(): " + (await contract_open.getGetter()));
+    console.log("getChallenges(): " + (await contract_open.getChallenges()));
 })();
